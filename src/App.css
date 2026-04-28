@@ -1558,38 +1558,155 @@ body {
 }
 
 /* ── Responsive ── */
-@media (max-width: 768px) {
-  .podium2-stage {
-    gap: 8px;
-    padding-bottom: 2vh;
-  }
-  .podium2-card {
+@media (max-width: 850px) {
+  .podium2-main {
     padding: 16px 12px;
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+
+  .podium2-heading {
+    margin-bottom: 1.5rem;
+  }
+
+  .podium2-stage {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding-bottom: 20px;
+    height: auto;
+  }
+
+  .podium2-slot {
+    flex-direction: row;
+    max-width: 100%;
+    align-items: center;
+    gap: 12px;
+    animation: p2-mobile-slide-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--step) * 0.1s);
+  }
+
+  @keyframes p2-mobile-slide-in {
+    from { opacity: 0; transform: translateX(-30px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .podium2-card {
+    margin-bottom: 0;
+    flex: 1;
+    padding: 12px 16px;
     border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    border-width: 2px !important;
   }
+
+  .podium2-card--champion {
+    border-width: 3px !important;
+  }
+
+  .podium2-crown {
+    font-size: 2rem;
+    margin-bottom: 0;
+    margin-right: 12px;
+  }
+
+  .podium2-team-name {
+    font-size: 1.2rem;
+    flex: 1;
+  }
+
+  .podium2-score {
+    margin-bottom: 0;
+    margin-right: 12px;
+  }
+
   .podium2-score-num {
-    font-size: clamp(1.8rem, 8vw, 3rem);
+    font-size: 1.8rem;
   }
-  .podium2-heading-title {
-    font-size: clamp(2rem, 10vw, 3rem);
+
+  .podium2-badge {
+    padding: 4px 10px;
+    font-size: 0.65rem;
+  }
+
+  .podium2-pedestal {
+    width: 60px;
+    height: 60px !important;
+    border-radius: 12px;
+    border-bottom: 3px solid rgba(0,0,0,0.15);
+    flex-shrink: 0;
+  }
+
+  .podium2-pedestal-rank {
+    font-size: 1.5rem;
+  }
+
+  .podium2-pedestal::after {
+    height: 100%;
+    width: 6px;
+    top: 0; left: 0;
+  }
+
+  .podium2-floor {
+    display: none;
+  }
+
+  .podium2-ticker-wrap {
+    height: 44px;
   }
 }
 
+@media (max-width: 480px) {
+  .podium2-trophy-large {
+    font-size: 3.5rem;
+  }
+  .podium2-heading-title {
+    font-size: 1.8rem;
+  }
+  .podium2-card {
+    padding: 10px;
+  }
+  .podium2-score-num {
+    font-size: 1.5rem;
+  }
+  .podium2-team-name {
+    font-size: 1rem;
+  }
+}
+
+/* Original App Responsiveness */
 @media (max-width: 1100px) {
   .topbar {
     flex-wrap: wrap;
     justify-content: center;
+    height: auto;
+    padding: 10px;
   }
-
   .topbar-totals {
     order: 3;
     width: 100%;
+    margin-top: 10px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .topbar-team {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+  .admin-panel {
+    padding: 15px;
+  }
+  .team-tabs {
     flex-wrap: wrap;
   }
-
-  .topbar-team {
-    max-width: 48%;
-    flex: 1 1 42%;
+  .team-tab {
+    flex: 1 1 40%;
+    font-size: 0.8rem;
   }
 }
 
