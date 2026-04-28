@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local SQLite (generated at runtime; folder kept via data/.gitkeep)
+data/*.sqlite
+data/*.sqlite-shm
+data/*.sqlite-wal

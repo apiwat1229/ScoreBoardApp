@@ -2,27 +2,25 @@ import { useEffect, useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import './App.css'
 import AdminPanel from './components/AdminPanel'
+import PodiumPage from './components/PodiumPage'
 import Scoreboard from './components/Scoreboard'
 import {
   IconArrowLeft,
   IconFullscreenEnter,
   IconFullscreenLeave,
+  IconPodium,
   IconSliders,
 } from './components/ToolbarIcons'
+import {
+  fetchScores,
+  loadScoresLocalBackup,
+  persistScoresRemote,
+  saveLocalMirror,
+} from './api/scoresStorage'
 import { DEFAULT_SCORES, TEAMS } from './data/mockData'
 import { useFullscreen } from './hooks/useFullscreen'
+import { useScoresSocket } from './hooks/useScoresSocket'
 import { useCountUp } from './hooks/useCountUp'
-
-const STORAGE_KEY = 'sportsdayScores'
-
-function loadScores() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    return saved ? JSON.parse(saved) : DEFAULT_SCORES
-  } catch {
-    return DEFAULT_SCORES
-  }
-}
 
 function getTotal(scores, teamId) {
   return Object.values(scores[teamId] || {}).reduce((a, b) => a + Number(b), 0)
@@ -107,14 +105,14 @@ function HomePage({ scores }) {
               {isFullscreen ? 'Exit full screen' : 'Full screen'}
             </span>
           </button>
+          <Link to="/podium" className="podium-link-btn">
+            <IconPodium className="toolbar-btn-icon" />
+            <span className="toolbar-btn-text">Podium</span>
+          </Link>
           <Link to="/admin" className="admin-link-btn">
             <IconSliders className="toolbar-btn-icon" />
             <span className="toolbar-btn-text">Edit scores</span>
           </Link>
-          <div className="nav-pill">
-            <span className="nav-dot" />
-            <span className="nav-pill-text">Auto · Slide</span>
-          </div>
         </div>
       </header>
 
@@ -125,7 +123,7 @@ function HomePage({ scores }) {
   )
 }
 
-function AdminPage({ scores, onScoreChange, onReset }) {
+function AdminPage({ scores, onScoreChange, onReset, onSave }) {
   return (
     <>
       <header className="topbar topbar-admin">
@@ -138,17 +136,43 @@ function AdminPage({ scores, onScoreChange, onReset }) {
       </header>
 
       <main className="main-content main-content--admin">
-        <AdminPanel scores={scores} onScoreChange={onScoreChange} onReset={onReset} />
+        <AdminPanel
+          scores={scores}
+          onScoreChange={onScoreChange}
+          onReset={onReset}
+          onSave={onSave}
+        />
       </main>
     </>
   )
 }
 
 function App() {
-  const [scores, setScores] = useState(loadScores)
+  const [scores, setScores] = useState(null)
+  const [hydrated, setHydrated] = useState(false)
+
+  useScoresSocket(setScores)
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(scores))
+    let cancelled = false
+    ;(async () => {
+      try {
+        const data = await fetchScores()
+        if (!cancelled) setScores(data)
+      } catch {
+        if (!cancelled) setScores(loadScoresLocalBackup(DEFAULT_SCORES))
+      } finally {
+        if (!cancelled) setHydrated(true)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (scores == null) return
+    saveLocalMirror(scores)
   }, [scores])
 
   const handleScoreChange = (teamId, subId, value) => {
@@ -158,26 +182,46 @@ function App() {
     }))
   }
 
+  const handleSave = async () => {
+    if (scores == null) return
+    await persistScoresRemote(scores)
+  }
+
   const handleReset = () => {
-    setScores({ ...DEFAULT_SCORES })
+    const next = structuredClone(DEFAULT_SCORES)
+    setScores(next)
+    persistScoresRemote(next).catch(() => {})
+  }
+
+  if (!hydrated || scores == null) {
+    return (
+      <div className="app app-loading">
+        <Background />
+        <div className="app-loading-inner">Loading scores…</div>
+      </div>
+    )
   }
 
   return (
     <div className="app">
       <Background />
-      <Routes>
-        <Route path="/" element={<HomePage scores={scores} />} />
-        <Route
-          path="/admin"
-          element={
-            <AdminPage
-              scores={scores}
-              onScoreChange={handleScoreChange}
-              onReset={handleReset}
-            />
-          }
-        />
-      </Routes>
+      <div className="app-body">
+        <Routes>
+          <Route path="/" element={<HomePage scores={scores} />} />
+          <Route path="/podium" element={<PodiumPage scores={scores} />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminPage
+                scores={scores}
+                onScoreChange={handleScoreChange}
+                onReset={handleReset}
+                onSave={handleSave}
+              />
+            }
+          />
+        </Routes>
+      </div>
     </div>
   )
 }

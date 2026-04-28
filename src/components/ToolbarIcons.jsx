@@ -67,3 +67,21 @@ export function IconArrowLeft(props) {
     </svg>
   )
 }
+
+export function IconPodium(props) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      {...props}
+    >
+      <path d="M8 21h8M8 21v-4l2-8h4l2 8v4M6 10h12M6 10V7a2 2 0 012-2h8a2 2 0 012 2v3" />
+      <path d="M10 11h4" />
+    </svg>
+  )
+}
