@@ -1202,26 +1202,44 @@ body {
 }
 
 .podium2-trophy-large {
-  font-size: clamp(4rem, 12vmin, 8rem);
+  font-size: clamp(3rem, 8vmin, 5rem);
   line-height: 1;
-  margin-bottom: 0.1em;
-  filter: drop-shadow(0 15px 30px rgba(255, 215, 0, 0.3));
+  margin-bottom: 0.2em;
+  filter: drop-shadow(0 10px 20px rgba(255, 215, 0, 0.25));
   animation: p2-trophy-glow 3s ease-in-out infinite;
 }
 
 @keyframes p2-trophy-glow {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 15px 30px rgba(255, 215, 0, 0.3)); }
-  50%       { transform: scale(1.05); filter: drop-shadow(0 20px 45px rgba(255, 215, 0, 0.5)); }
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 10px 20px rgba(255, 215, 0, 0.25)); }
+  50%       { transform: scale(1.08); filter: drop-shadow(0 15px 30px rgba(255, 215, 0, 0.4)); }
 }
 
 .podium2-heading-kicker {
-  font-size: clamp(1.2rem, 3vmin, 2rem);
+  font-size: clamp(0.9rem, 2vmin, 1.2rem);
   font-weight: 800;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: #1a2744;
+  color: #7d8aae;
+  margin: 0 0 0.4rem;
+}
+
+.podium2-heading-title {
   margin: 0;
-  opacity: 0.9;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vmin, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: #1a2744;
+}
+
+.podium2-heading-sub {
+  margin-top: 0.6rem;
+  font-size: clamp(0.8rem, 1.6vmin, 1rem);
+  color: #5f6f94;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 /* ── Podium stage row ── */
@@ -1258,8 +1276,8 @@ body {
   position: relative;
   width: 100%;
   border-radius: 28px;
-  border: 3px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.9);
+  border: 4px solid var(--tc); /* Thick team color border */
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   padding: clamp(24px, 4vh, 36px) clamp(16px, 2vw, 24px);
@@ -1267,7 +1285,7 @@ body {
   margin-bottom: 16px;
   box-shadow:
     0 20px 45px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(0, 0, 0, 0.02),
+    0 0 15px color-mix(in srgb, var(--tc) 30%, transparent), /* Glow */
     inset 0 1px 0 #fff;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -1275,18 +1293,21 @@ body {
 
 .podium2-card:hover {
   transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
-  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.15),
+    0 0 25px color-mix(in srgb, var(--tc) 50%, transparent);
+  border-width: 5px;
 }
 
 .podium2-card--champion {
   background: #ffffff;
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.15),
-    0 0 30px rgba(255, 215, 0, 0.15),
+    0 0 30px rgba(255, 215, 0, 0.25),
     inset 0 1px 0 #fff;
   animation: p2-champion-float 6s ease-in-out infinite;
   overflow: visible;
+  border-width: 5px;
 }
 
 @keyframes p2-champion-float {
@@ -1297,14 +1318,14 @@ body {
 /* Cinematic Border Beam for Champion */
 .podium2-border-beam {
   position: absolute;
-  inset: -3px;
-  border-radius: 31px;
+  inset: -5px;
+  border-radius: 33px;
   background: linear-gradient(90deg, transparent, #FFD700, #FF9500, transparent);
   background-size: 200% 200%;
   z-index: -1;
   animation: p2-border-beam-move 3s linear infinite;
-  filter: blur(4px);
-  opacity: 0.9;
+  filter: blur(6px);
+  opacity: 1;
 }
 
 @keyframes p2-border-beam-move {
@@ -1319,22 +1340,6 @@ body {
   line-height: 1;
   margin-bottom: 0.4em;
   filter: drop-shadow(0 6px 15px rgba(0,0,0,0.15));
-}
-
-.podium2-crown--top {
-  position: absolute;
-  top: -1.2em;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: clamp(3.5rem, 8vmin, 5.5rem);
-  z-index: 10;
-  animation: p2-crown-float 4s ease-in-out infinite;
-  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
-}
-
-@keyframes p2-crown-float {
-  0%, 100% { transform: translateX(-50%) translateY(0) rotate(-2deg); }
-  50%       { transform: translateX(-50%) translateY(-10px) rotate(2deg); }
 }
 
 .podium2-team-name {
@@ -1379,10 +1384,10 @@ body {
   text-transform: uppercase;
   padding: 8px 20px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--tc, #1a2744) 12%, #f0f4f8);
-  border: 1px solid color-mix(in srgb, var(--tc, #1a2744) 25%, transparent);
-  color: var(--tc, #5f6f94);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  background: color-mix(in srgb, var(--tc, #1a2744) 15%, #f8fafc);
+  border: 2px solid var(--tc);
+  color: var(--tc);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 /* ── Pedestal ── */
@@ -1396,10 +1401,10 @@ body {
     #ffffff 0%,
     #fcfdfe 100%
   );
-  border: 2px solid rgba(0, 0, 0, 0.1);
+  border: 3px solid rgba(0, 0, 0, 0.15);
   border-bottom: none;
   box-shadow:
-    0 12px 35px rgba(0, 0, 0, 0.08),
+    0 12px 35px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 #fff;
   will-change: height;
 }
@@ -1414,19 +1419,47 @@ body {
 
 .podium2-pedestal-rank {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 5vmin, 3.5rem);
-  font-weight: 800;
-  color: #1a2744;
-  opacity: 0.1;
+  font-size: clamp(2.2rem, 5.5vmin, 4rem);
+  font-weight: 900;
+  color: var(--tc);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  opacity: 0.9;
+}
+
+/* Pedestal rank trick: Glass shimmer */
+.podium2-pedestal-rank::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -100%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: rotate(30deg);
+  animation: p2-pedestal-shimmer 4s infinite;
+}
+
+@keyframes p2-pedestal-shimmer {
+  0%   { left: -100%; }
+  20%, 100% { left: 200%; }
 }
 
 .podium2-pedestal::after {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 8px;
+  height: 12px;
   background: var(--tc);
-  opacity: 0.6;
+  opacity: 1;
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--tc) 40%, transparent);
 }
 
 /* ── Floor line ── */
@@ -1442,6 +1475,86 @@ body {
     rgba(0, 0, 0, 0.05) 80%,
     transparent
   );
+}
+
+/* ── Ticker / Marquee ── */
+.podium2-ticker-wrap {
+  position: relative;
+  height: 52px;
+  background: rgba(10, 20, 40, 0.95); /* Midnight Dark */
+  backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.podium2-ticker {
+  width: 100%;
+  overflow: hidden;
+}
+
+.podium2-ticker-track {
+  display: flex;
+  width: max-content;
+}
+
+.podium2-ticker-content {
+  display: flex;
+  flex-shrink: 0;
+  animation: p2-ticker-scroll 60s linear infinite;
+  white-space: nowrap;
+  padding-left: 50px;
+}
+
+.podium2-ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-right: 50px;
+}
+
+.p2-ticker-sport {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 4px 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+}
+
+.p2-ticker-team {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  /* Make colors pop on dark bg */
+  text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.p2-ticker-team strong {
+  margin-left: 5px;
+  font-family: var(--font-mono);
+  font-weight: 900;
+  color: #fff;
+  background: rgba(0,0,0,0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.p2-ticker-sep {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 1.4rem;
+  margin-left: 15px;
+}
+
+@keyframes p2-ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
 
 /* ── Responsive ── */

@@ -5,7 +5,7 @@ import {
   IconFullscreenEnter,
   IconFullscreenLeave,
 } from './ToolbarIcons'
-import { TEAMS } from '../data/mockData'
+import { EVENTS, TEAMS } from '../data/mockData'
 import { useFullscreen } from '../hooks/useFullscreen'
 
 function getTotal(scores, teamId) {
@@ -118,15 +118,10 @@ function PodiumSlot({ team, rank, step, maxScore }) {
     >
       {/* floating card */}
       <div className={`podium2-card ${isFirst ? 'podium2-card--champion' : ''}`} style={{ borderColor: `${team.color}44` }}>
-        {isFirst && (
-          <>
-            <div className="podium2-border-beam" aria-hidden />
-            <span className="podium2-crown podium2-crown--top">👑</span>
-          </>
-        )}
+        {isFirst && <div className="podium2-border-beam" aria-hidden />}
         <div className="podium2-card-glow" aria-hidden />
 
-        {!isFirst && <span className="podium2-crown">{meta.crown}</span>}
+        <span className="podium2-crown">{meta.crown}</span>
 
         <div className="podium2-team-name">{team.label}</div>
 
@@ -148,7 +143,7 @@ function PodiumSlot({ team, rank, step, maxScore }) {
         }}
       >
         <div className="podium2-pedestal-face">
-          <span className="podium2-pedestal-rank" style={{ color: team.color, opacity: 0.2 }}>{meta.label}</span>
+          <span className="podium2-pedestal-rank" style={{ color: team.color }}>{meta.label}</span>
         </div>
         <div className="podium2-pedestal-shine" aria-hidden />
         <div className="podium2-pedestal-bottom" aria-hidden />
@@ -165,12 +160,28 @@ export default function PodiumPage({ scores }) {
       .sort((a, b) => b.total - a.total)
   }, [scores])
 
-  const maxScore = useMemo(() => Math.max(...ranked.map(t => t.total), 1), [ranked])
+  const maxScore = ranked[0]?.total || 0
+  const top4 = ranked.slice(0, 4)
 
-  // Podium visual order: 2nd | 1st | 3rd | 4th
-  const displayOrder = [ranked[1], ranked[0], ranked[2], ranked[3]]
-  const displayRanks = [2, 1, 3, 4]
-  const displaySteps = [1, 0, 2, 3]
+  // Layout order: [2nd, 1st, 3rd, 4th]
+  const displayOrder = [
+    { team: top4[1], rank: 2, step: 1 },
+    { team: top4[0], rank: 1, step: 0 },
+    { team: top4[2], rank: 3, step: 2 },
+    { team: top4[3], rank: 4, step: 3 },
+  ].filter((item) => !!item.team)
+
+  // Ticker content: Summary of scores per category
+  const sportSummaries = useMemo(() => {
+    return EVENTS.map(event => {
+      const teamBreakdown = TEAMS.map(team => {
+        const teamScores = scores[team.id] || {}
+        const sportTotal = event.subEvents.reduce((sum, sub) => sum + Number(teamScores[sub.id] || 0), 0)
+        return { label: team.label, color: team.color, score: sportTotal }
+      })
+      return { label: event.label, breakdown: teamBreakdown }
+    })
+  }, [scores])
 
   return (
     <div className="podium2-page">
@@ -212,25 +223,49 @@ export default function PodiumPage({ scores }) {
         {/* heading */}
         <header className="podium2-heading" aria-labelledby="podium2-title">
           <div className="podium2-trophy-large" aria-hidden>🏆</div>
-          <p id="podium2-title" className="podium2-heading-kicker">Official Results</p>
+          <p className="podium2-heading-kicker">Y.T. Rubber Sports Day 2026 Summary</p>
+          <h1 id="podium2-title" className="podium2-heading-title">Live Scoreboard</h1>
         </header>
 
         {/* podium stage */}
         <div className="podium2-stage" role="list" aria-label="Podium rankings">
-          {displayOrder.map((team, i) => (
+          {displayOrder.map((item, i) => (
             <PodiumSlot
-              key={team.id}
-              team={team}
-              rank={displayRanks[i]}
-              step={displaySteps[i]}
+              key={item.team.id}
+              team={item.team}
+              rank={item.rank}
+              step={item.step}
               maxScore={maxScore}
             />
           ))}
         </div>
 
         {/* floor line */}
-        <div className="podium2-floor" aria-hidden />
+        <div className="podium2-floor" />
       </main>
+
+      {/* Real-time Ticker */}
+      <footer className="podium2-ticker-wrap">
+        <div className="podium2-ticker">
+          <div className="podium2-ticker-track">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="podium2-ticker-content" aria-hidden={i > 0}>
+                {sportSummaries.map((sport, idx) => (
+                  <div key={idx} className="podium2-ticker-item">
+                    <span className="p2-ticker-sport">{sport.label}</span>
+                    {sport.breakdown.map((t, tidx) => (
+                      <span key={tidx} className="p2-ticker-team" style={{ color: t.color }}>
+                        {t.label} <strong>{t.score}</strong>
+                      </span>
+                    ))}
+                    <span className="p2-ticker-sep">•</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

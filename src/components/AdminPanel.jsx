@@ -84,9 +84,6 @@ export default function AdminPanel({ scores, onScoreChange, onReset, onSave }) {
         ) : null}
       </div>
 
-      <button type="button" className="reset-btn" onClick={onReset}>
-        Reset All Scores
-      </button>
     </div>
   )
 }
