@@ -1189,8 +1189,11 @@ body {
 /* ── Heading ── */
 .podium2-heading {
   text-align: center;
-  margin-bottom: clamp(2rem, 5vh, 4rem);
+  margin-bottom: clamp(1rem, 3vh, 2rem);
   animation: p2-drop-in 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 @keyframes p2-drop-in {
@@ -1198,46 +1201,27 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.podium2-heading-kicker {
-  font-size: clamp(0.75rem, 1.8vmin, 1rem);
-  font-weight: 800;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: #7d8aae;
-  margin-bottom: 0.5rem;
-}
-
-.podium2-heading-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 7vmin, 4.5rem);
-  font-weight: 800;
-  letter-spacing: 0.02em;
+.podium2-trophy-large {
+  font-size: clamp(4rem, 12vmin, 8rem);
   line-height: 1;
+  margin-bottom: 0.1em;
+  filter: drop-shadow(0 15px 30px rgba(255, 215, 0, 0.3));
+  animation: p2-trophy-glow 3s ease-in-out infinite;
+}
+
+@keyframes p2-trophy-glow {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 15px 30px rgba(255, 215, 0, 0.3)); }
+  50%       { transform: scale(1.05); filter: drop-shadow(0 20px 45px rgba(255, 215, 0, 0.5)); }
+}
+
+.podium2-heading-kicker {
+  font-size: clamp(1.2rem, 3vmin, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
   color: #1a2744;
-  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-}
-
-.podium2-heading-accent {
-  background: linear-gradient(95deg, #FFD700 0%, #FF9500 50%, #FFD700 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: p2-shimmer 4s ease-in-out infinite;
-}
-
-@keyframes p2-shimmer {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
-}
-
-.podium2-heading-sub {
-  margin-top: 0.75rem;
-  font-size: clamp(0.85rem, 1.8vmin, 1.1rem);
-  color: #5f6f94;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  margin: 0;
+  opacity: 0.9;
 }
 
 /* ── Podium stage row ── */

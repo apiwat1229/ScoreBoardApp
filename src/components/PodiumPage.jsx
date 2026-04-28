@@ -211,13 +211,8 @@ export default function PodiumPage({ scores }) {
       <main className="podium2-main">
         {/* heading */}
         <header className="podium2-heading" aria-labelledby="podium2-title">
-          <p className="podium2-heading-kicker">🏆 Official Results</p>
-          <h1 id="podium2-title" className="podium2-heading-title">
-            Overall&nbsp;<span className="podium2-heading-accent">Standings</span>
-          </h1>
-          <p className="podium2-heading-sub">
-            Consolidated team totals · authoritative ranking by points
-          </p>
+          <div className="podium2-trophy-large" aria-hidden>🏆</div>
+          <p id="podium2-title" className="podium2-heading-kicker">Official Results</p>
         </header>
 
         {/* podium stage */}
