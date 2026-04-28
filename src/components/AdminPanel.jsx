@@ -4,6 +4,7 @@ import { EVENTS, TEAMS } from '../data/mockData'
 export default function AdminPanel({ scores, onScoreChange, onReset, onSave }) {
   const [activeTeam, setActiveTeam] = useState(TEAMS[0].id)
   const [saveStatus, setSaveStatus] = useState('')
+  const [showModal, setShowModal] = useState(false)
 
   const team = TEAMS.find((t) => t.id === activeTeam)
 
@@ -11,8 +12,9 @@ export default function AdminPanel({ scores, onScoreChange, onReset, onSave }) {
     setSaveStatus('Saving…')
     try {
       await onSave()
-      setSaveStatus('Saved')
-      setTimeout(() => setSaveStatus(''), 2500)
+      setSaveStatus('')
+      setShowModal(true)
+      setTimeout(() => setShowModal(false), 2000)
     } catch {
       setSaveStatus('Save failed — check API')
       setTimeout(() => setSaveStatus(''), 4000)
@@ -22,6 +24,16 @@ export default function AdminPanel({ scores, onScoreChange, onReset, onSave }) {
   return (
     <div className="admin-panel">
       <h2 className="admin-title">Admin — Update Scores</h2>
+
+      {showModal && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <div className="admin-modal-icon">🏆</div>
+            <h3>Saved Successfully!</h3>
+            <p>Scores are now live on the scoreboard.</p>
+          </div>
+        </div>
+      )}
 
       <div className="team-tabs">
         {TEAMS.map((t) => (
@@ -62,10 +74,12 @@ export default function AdminPanel({ scores, onScoreChange, onReset, onSave }) {
                 <input
                   type="number"
                   min="0"
-                  value={scores[activeTeam]?.[sub.id] ?? 0}
-                  onChange={(e) =>
-                    onScoreChange(activeTeam, sub.id, Number(e.target.value))
-                  }
+                  value={scores[activeTeam]?.[sub.id] || ''}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => {
+                    const val = e.target.value === '' ? 0 : Number(e.target.value)
+                    onScoreChange(activeTeam, sub.id, val)
+                  }}
                 />
               </div>
             ))}
@@ -74,16 +88,15 @@ export default function AdminPanel({ scores, onScoreChange, onReset, onSave }) {
       </div>
 
       <div className="admin-save-row">
-        <button type="button" className="admin-save-btn" onClick={handleSaveClick}>
-          Save to server
+        <button type="button" className="admin-save-btn" onClick={handleSaveClick} disabled={saveStatus === 'Saving…'}>
+          {saveStatus === 'Saving…' ? 'Saving…' : 'Save to server'}
         </button>
-        {saveStatus ? (
+        {saveStatus && saveStatus !== 'Saving…' ? (
           <span className="admin-save-status" aria-live="polite">
             {saveStatus}
           </span>
         ) : null}
       </div>
-
     </div>
   )
 }

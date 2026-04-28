@@ -1,9 +1,9 @@
 /**
- * API + SQLite + Socket.IO (realtime scores) + optional static SPA.
+ * API + JSON File Storage + Socket.IO (realtime scores) + optional static SPA.
+ * Switched from SQLite to JSON to avoid binary compatibility issues during deployment.
  */
 import cors from 'cors'
 import express from 'express'
-import Database from 'better-sqlite3'
 import fs from 'fs'
 import { createServer } from 'http'
 import path from 'path'
@@ -14,38 +14,35 @@ import { DEFAULT_SCORES } from '../src/data/mockData.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(__dirname, '..')
 const dataDir = path.join(root, 'data')
-const dbPath = path.join(dataDir, 'scores.sqlite')
+const jsonPath = path.join(dataDir, 'scores.json')
 
-fs.mkdirSync(dataDir, { recursive: true })
+// Ensure data directory exists
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true })
+}
 
-const db = new Database(dbPath)
-db.pragma('journal_mode = WAL')
-db.exec(`
-  CREATE TABLE IF NOT EXISTS kv (
-    key TEXT PRIMARY KEY NOT NULL,
-    value TEXT NOT NULL
-  );
-`)
-
-const selectScores = db.prepare('SELECT value FROM kv WHERE key = ?')
-const upsertScores = db.prepare(
-  'INSERT INTO kv (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
-)
-
+/** Helper to read scores from JSON file */
 function readScoresFromDb() {
-  const row = selectScores.get('scores')
-  if (!row) return null
+  if (!fs.existsSync(jsonPath)) return null
   try {
-    return JSON.parse(row.value)
-  } catch {
+    const raw = fs.readFileSync(jsonPath, 'utf8')
+    return JSON.parse(raw)
+  } catch (err) {
+    console.error('Error reading JSON DB:', err)
     return null
   }
 }
 
+/** Helper to write scores to JSON file */
 function writeScoresToDb(obj) {
-  upsertScores.run('scores', JSON.stringify(obj))
+  try {
+    fs.writeFileSync(jsonPath, JSON.stringify(obj, null, 2), 'utf8')
+  } catch (err) {
+    console.error('Error writing JSON DB:', err)
+  }
 }
 
+// Initialize if empty
 if (!readScoresFromDb()) {
   writeScoresToDb(structuredClone(DEFAULT_SCORES))
 }
@@ -79,14 +76,20 @@ app.put('/api/scores', (req, res) => {
     res.status(400).json({ error: 'Invalid body' })
     return
   }
+  
+  // Basic validation of team keys
   const teams = ['pink', 'yellow', 'blue', 'green']
   if (!teams.every((id) => body[id] && typeof body[id] === 'object')) {
     res.status(400).json({ error: 'Missing team scores' })
     return
   }
+
   writeScoresToDb(body)
   const next = readScoresFromDb()
+  
+  // Broadcast to ALL connected clients
   io.emit('scores:update', next)
+  
   res.json(next)
 })
 
@@ -132,7 +135,7 @@ if (isProd && fs.existsSync(dist)) {
 
 const PORT = Number(process.env.PORT) || 8787
 httpServer.listen(PORT, () => {
-  console.log(`SQLite DB: ${dbPath}`)
+  console.log(`JSON DB: ${jsonPath}`)
   console.log(`Realtime: Socket.IO on same port`)
   if (isProd) {
     console.log(`Open http://localhost:${PORT} (static + api)`)

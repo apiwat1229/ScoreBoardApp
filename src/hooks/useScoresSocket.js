@@ -9,7 +9,13 @@ export function useScoresSocket(setScores) {
   useEffect(() => {
     const handler = (payload) => {
       if (payload && typeof payload === 'object') {
-        setScores(payload)
+        setScores((prev) => {
+          // Prevent infinite loop: only update if data is actually different
+          if (JSON.stringify(prev) === JSON.stringify(payload)) {
+            return prev
+          }
+          return payload
+        })
       }
     }
     return subscribeScoresUpdate(handler)

@@ -14,9 +14,9 @@ function getTotal(scores, teamId) {
 
 const RANK_META = {
   1: { crown: '👑', label: '1st', suffix: 'CHAMPION' },
-  2: { crown: '🥈', label: '2nd', suffix: 'RUNNER-UP' },
-  3: { crown: '🥉', label: '3rd', suffix: '3RD PLACE' },
-  4: { crown: '🏅', label: '4th', suffix: '4TH PLACE' },
+  2: { crown: '🥈', label: '2nd', suffix: '2nd Place' },
+  3: { crown: '🥉', label: '3rd', suffix: '3rd Place' },
+  4: { crown: '🏅', label: '4th', suffix: '4th Place' },
 }
 
 /* ── Confetti canvas ─────────────────────────────────────── */

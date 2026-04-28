@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import './App.css'
 import AdminPanel from './components/AdminPanel'
@@ -155,24 +155,56 @@ function App() {
 
   useEffect(() => {
     let cancelled = false
-    ;(async () => {
+    const load = async () => {
       try {
         const data = await fetchScores()
-        if (!cancelled) setScores(data)
+        if (!cancelled) {
+          setScores(prev => {
+             if (JSON.stringify(prev) === JSON.stringify(data)) return prev
+             return data
+          })
+        }
       } catch {
-        if (!cancelled) setScores(loadScoresLocalBackup(DEFAULT_SCORES))
+        if (!cancelled && scores == null) {
+          setScores(loadScoresLocalBackup(DEFAULT_SCORES))
+        }
       } finally {
         if (!cancelled) setHydrated(true)
       }
-    })()
+    }
+
+    load()
+    
+    // Polling fallback: Every 2 seconds
+    const interval = setInterval(load, 2000)
+    
     return () => {
       cancelled = true
+      clearInterval(interval)
     }
   }, [])
+
+  // Track the last scores that were sent/received from server to avoid sync loops
+  const lastSyncRef = useRef(null)
 
   useEffect(() => {
     if (scores == null) return
     saveLocalMirror(scores)
+    
+    const scoreStr = JSON.stringify(scores)
+    if (lastSyncRef.current === scoreStr) return
+    
+    // Auto-sync to server (debounced 1s)
+    const timer = setTimeout(async () => {
+      try {
+        const next = await persistScoresRemote(scores)
+        lastSyncRef.current = JSON.stringify(next)
+      } catch {
+        // fail silently or handle error
+      }
+    }, 1000)
+    
+    return () => clearTimeout(timer)
   }, [scores])
 
   const handleScoreChange = (teamId, subId, value) => {
