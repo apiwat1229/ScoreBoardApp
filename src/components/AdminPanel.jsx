@@ -14,7 +14,7 @@ export default function AdminPanel({ scores, onScoreChange, onReset, onSave }) {
       await onSave()
       setSaveStatus('')
       setShowModal(true)
-      setTimeout(() => setShowModal(false), 2000)
+      setTimeout(() => setShowModal(false), 3500)
     } catch {
       setSaveStatus('Save failed — check API')
       setTimeout(() => setSaveStatus(''), 4000)
@@ -30,7 +30,7 @@ export default function AdminPanel({ scores, onScoreChange, onReset, onSave }) {
           <div className="admin-modal">
             <div className="admin-modal-icon">🏆</div>
             <h3>Saved Successfully!</h3>
-            <p>Scores are now live on the scoreboard.</p>
+            <p><strong>{team.label} Team</strong> scores are now live.</p>
           </div>
         </div>
       )}
